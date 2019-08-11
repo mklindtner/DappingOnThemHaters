@@ -2,6 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import requests
 import re
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+#requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions)
 
 urls_response = {}
 #consider putting credentials in a .conf file
@@ -11,7 +15,9 @@ email_password = 'hackerhome'
 def checkRequestUrl(url):    
     if("https" in url):
         try:
-            request = requests.get(url)    
+            #don't do this for production. Instead make a white list of accepted https
+            # the reason why we don't verify is because some of them gives a bad handshake i.e. bad certificate, lazy bums!
+            request = requests.get(url, verify=False)
             if(request.status_code >= 200 and request.status_code <= 400):
                 urls_response[url] = request.status_code
             else: 

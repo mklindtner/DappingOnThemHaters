@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import requests
+import re
 
 urls_response = {}
 
@@ -31,19 +32,30 @@ def getHttpsFromWebsite(url):
     try:
         #pages = browser.find_element(By., "paginaton")
         pages = browser.find_element_by_class_name("pagination")
-        next_button = pages.find_elements(By.TAG_NAME, "li")[-1]
-        while(next_button.isEnabled()):
-
-            pages = browser.find_element_by_class_name("pagination")
-            next_button = pages[len(pages)-1]
-
+        links = pages.find_elements(By.TAG_NAME, "li")[-1]
+        while(True):
+            #find tables 
             table = browser.find_element(By.TAG_NAME, "tbody")
             table_rows = table.find_elements(By.TAG_NAME, "tr")
             for tr in table_rows:
                 specific_col = tr.find_elements(By.TAG_NAME, "td")[3]
-                checkRequestUrl(specific_col.get_attribute("innerHTML"))
-            next_button.click()
+                checkRequestUrl(specific_col.get_attribute("innerHTML"))        
+
+            #get next page link
+            pages = browser.find_element_by_class_name("pagination")
+            link = pages.find_elements(By.TAG_NAME, "li")[-1]            
+            strLink = link.get_attribute("innerHTML")            
+            links = re.findall("(\"https.*?\")",strLink)
+            if(not links): 
+                break #break if at last page, empty links list = no next page
+            link = links[0][1:-1] #get first element and remove first " and last ""
+
             displayWrongLinks()
+            print("----")
+            browser.get(link) #next page
+        
+        displayWrongLinks()        
+        print("---finished searching---")
         
     finally:
         browser.quit()
@@ -57,10 +69,9 @@ def displayWrongLinks():
             print(key)
 
 
-getHttpsFromWebsite("https://www.plusserviceonline.com/marketing/endpage-offers?page=1")
-displayWrongLinks(urls_response)
-print("------")
-print(urls_response)
+getHttpsFromWebsite("https://www.plusserviceonline.com/marketing/endpage-offers?page=4")
+#displayWrongLinks(urls_response)
+#print(urls_response)
 
 #use selenium to go to next page
 #a) check if disabled

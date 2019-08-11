@@ -4,6 +4,9 @@ import requests
 import re
 
 urls_response = {}
+#consider putting credentials in a .conf file
+email_login = 'christian@guzzy.dk'
+email_password = 'hackerhome'
 
 def checkRequestUrl(url):    
     if("https" in url):
@@ -19,20 +22,18 @@ def checkRequestUrl(url):
 
 
 def getHttpsFromWebsite(url):
+    #startup browser and login
     browser = webdriver.Firefox(executable_path  = "/home/mikkel/Documents/geckodriver")
     browser.get(url) 
     email = browser.find_element_by_id('email')
     password = browser.find_element_by_id('password')
-    email.send_keys('christian@guzzy.dk')
-    password.send_keys('hackerhome')
+    email.send_keys(email_login)
+    password.send_keys(email_password)
 
     submit_button = browser.find_element(By.XPATH, '//button[@type="submit"]')
     submit_button.click()
 
     try:
-        #pages = browser.find_element(By., "paginaton")
-        pages = browser.find_element_by_class_name("pagination")
-        links = pages.find_elements(By.TAG_NAME, "li")[-1]
         while(True):
             #find tables 
             table = browser.find_element(By.TAG_NAME, "tbody")
@@ -56,12 +57,10 @@ def getHttpsFromWebsite(url):
         
         displayWrongLinks()        
         print("---finished searching---")
-        
+
     finally:
         browser.quit()
     
-    
-
 
 def displayWrongLinks():
     for key, value in urls_response.items():
@@ -69,18 +68,4 @@ def displayWrongLinks():
             print(key)
 
 
-getHttpsFromWebsite("https://www.plusserviceonline.com/marketing/endpage-offers?page=4")
-#displayWrongLinks(urls_response)
-#print(urls_response)
-
-#use selenium to go to next page
-#a) check if disabled
-#a.1) click
-#a.2) stop
-#b) while is not disabled, run.
-
-
-
-
-#if disabled exist stop
-#get next 
+getHttpsFromWebsite("https://www.plusserviceonline.com/marketing/endpage-offers?page=1")

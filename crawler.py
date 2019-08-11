@@ -1,6 +1,6 @@
-import requests
 from selenium import webdriver
-import time
+from selenium.webdriver.common.by import By
+import requests
 
 urls_response = {}
 
@@ -8,13 +8,13 @@ def checkRequestUrl(url):
     if("https" in url):
         try:
             request = requests.get(url)    
-            urls_response[url] = request.status_code
+            if(request.status_code >= 200 and request.status_code <= 400):
+                urls_response[url] = request.status_code
+            else: 
+                urls_response[url] = 404
         except:
             urls_response[url] = 404
-        print(urls_response)
-
-    else:
-        print("not today! hosie!")
+    return urls_response
 
 
 def getHttpsFromWebsite(url):
@@ -25,26 +25,51 @@ def getHttpsFromWebsite(url):
     email.send_keys('christian@guzzy.dk')
     password.send_keys('hackerhome')
 
-    #submit_button = browser.find_element_
-    #submit_button.click()
-    time.sleep(10)
-    browser.quit()
+    submit_button = browser.find_element(By.XPATH, '//button[@type="submit"]')
+    submit_button.click()
 
-getHttpsFromWebsite("https://www.plusserviceonline.com/auth/login")
+    try:
+        #pages = browser.find_element(By., "paginaton")
+        pages = browser.find_element_by_class_name("pagination")
+        next_button = pages.find_elements(By.TAG_NAME, "li")[-1]
+        while(next_button.isEnabled()):
 
-# checkRequestUrl('https://api.github.com')
-# checkRequestUrl('https://NotRealAtlltFUck.com')
-# checkRequestUrl('I AM NOT FUCKIGN REAL ? ')
+            pages = browser.find_element_by_class_name("pagination")
+            next_button = pages[len(pages)-1]
+
+            table = browser.find_element(By.TAG_NAME, "tbody")
+            table_rows = table.find_elements(By.TAG_NAME, "tr")
+            for tr in table_rows:
+                specific_col = tr.find_elements(By.TAG_NAME, "td")[3]
+                checkRequestUrl(specific_col.get_attribute("innerHTML"))
+            next_button.click()
+            displayWrongLinks()
+        
+    finally:
+        browser.quit()
+    
+    
 
 
+def displayWrongLinks():
+    for key, value in urls_response.items():
+        if(value == 404):
+            print(key)
 
 
-#make dict for all https:
+getHttpsFromWebsite("https://www.plusserviceonline.com/marketing/endpage-offers?page=1")
+displayWrongLinks(urls_response)
+print("------")
+print(urls_response)
 
-#go through 1 page and find all links
 #use selenium to go to next page
+#a) check if disabled
+#a.1) click
+#a.2) stop
+#b) while is not disabled, run.
 
 
 
 
-
+#if disabled exist stop
+#get next 

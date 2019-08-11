@@ -1,11 +1,10 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 import requests
 import re
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-#requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions)
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning) #disable warning for bad certificates
+import conf
 
 urls_response = {}
 #consider putting credentials in a .conf file
@@ -29,12 +28,12 @@ def checkRequestUrl(url):
 
 def getHttpsFromWebsite(url):
     #startup browser and login
-    browser = webdriver.Firefox(executable_path  = "/home/mikkel/Documents/geckodriver")
+    browser = webdriver.Firefox(executable_path  = conf.firefox_geckodriver) #remember to change me to your own path
     browser.get(url) 
     email = browser.find_element_by_id('email')
     password = browser.find_element_by_id('password')
-    email.send_keys(email_login)
-    password.send_keys(email_password)
+    email.send_keys(conf.email_login)
+    password.send_keys(conf.email_password)
 
     submit_button = browser.find_element(By.XPATH, '//button[@type="submit"]')
     submit_button.click()
